@@ -4,15 +4,21 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')  # Must be set in Render environment variables
+# ==============================
+# SECURITY
+# ==============================
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
-ALLOWED_HOSTS = ['grocery-bud-django-dwww.onrender.com', 'localhost', '127.0.0.1']
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Application definition
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
+
+
+# ==============================
+# APPLICATIONS
+# ==============================
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,12 +26,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'grocery',  # Your app
+    'grocery',
 ]
+
+
+# ==============================
+# MIDDLEWARE
+# ==============================
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static files on Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -33,6 +44,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# ==============================
+# URLS / WSGI
+# ==============================
 
 ROOT_URLCONF = 'djangocrud.urls'
 
@@ -54,18 +70,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangocrud.wsgi.application'
 
-# DATABASE CONFIGURATION - THIS IS THE FIXED PART
-# Check if we're on Render (with DATABASE_URL provided)
+
+# ==============================
+# DATABASE
+# ==============================
+
 if 'DATABASE_URL' in os.environ:
-    # Production: Use PostgreSQL from Render
     DATABASES = {
         'default': dj_database_url.config(
             conn_max_age=600,
-            ssl_require=True  # This works for PostgreSQL
+            ssl_require=True
         )
     }
 else:
-    # Development: Use SQLite locally
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -73,36 +90,41 @@ else:
         }
     }
 
-# Password validation
+
+# ==============================
+# PASSWORD VALIDATION
+# ==============================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+
+# ==============================
+# INTERNATIONALIZATION
+# ==============================
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+
+# ==============================
+# STATIC FILES
+# ==============================
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Auto-add Render hostname
-if 'RENDER' in os.environ:
-    ALLOWED_HOSTS.append(os.environ.get('RENDER_EXTERNAL_HOSTNAME'))
+# ==============================
+# DEFAULT PRIMARY KEY
+# ==============================
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
