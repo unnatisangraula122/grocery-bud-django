@@ -5,7 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')  # No default – must be set in Render
+SECRET_KEY = os.environ.get('SECRET_KEY')  # Must be set in Render environment variables
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -25,7 +25,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,17 +54,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangocrud.wsgi.application'
 
-# Database - Use PostgreSQL on Render, SQLite locally
+# DATABASE CONFIGURATION - THIS IS THE FIXED PART
+# Check if we're on Render (with DATABASE_URL provided)
 if 'DATABASE_URL' in os.environ:
-    # On Render (production)
+    # Production: Use PostgreSQL from Render
     DATABASES = {
         'default': dj_database_url.config(
             conn_max_age=600,
-            ssl_require=True
+            ssl_require=True  # This works for PostgreSQL
         )
     }
 else:
-    # Local development
+    # Development: Use SQLite locally
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
