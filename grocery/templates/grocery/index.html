@@ -15,24 +15,24 @@
 <body>
 <section class="section-center">
 
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <!-- Add / Edit Form -->
     <form method="POST"
           action="{% if edit_item %}{% url 'grocery:update' edit_item.id %}{% else %}{% url 'grocery:add' %}{% endif %}">
         {% csrf_token %}
         <h2>grocery bud</h2>
         <div class="form-control">
-            <input 
-                type="text" 
-                name="name" 
-                class="form-input" 
-                placeholder="e.g. eggs" 
-                value="{{ edit_item.name|default:'' }}"
-                {% if edit_item %}autofocus{% endif %}
-                required
-            />
-            <button type="submit" class="btn">
-                {% if edit_item %}edit item{% else %}add item{% endif %}
-            </button>
+            <input type="text" name="name" class="form-input" placeholder="e.g. eggs"
+                   value="{{ edit_item.name|default:'' }}" {% if edit_item %}autofocus{% endif %} required />
+            <button type="submit" class="btn">{% if edit_item %}edit item{% else %}add item{% endif %}</button>
         </div>
     </form>
 
